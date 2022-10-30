@@ -7,9 +7,13 @@ data have been collected in november-december 2020
 # storing the data 
 after converting the csv data into a sqlite 
 
+```
 CREATE TABLE application (timestamp DATETIME, date DATETIME, time TEXT, userid INTEGER, application TEXT);
+
 CREATE TABLE touch (timestamp DATETIME, date DATETIME, time TEXT, userid INTEGER);
-CREATE TABLE location (timestamp DATETIME, date DATETIME, time text, userid INTEGER, suburb TEXT, city TEXT, region TEXT, moving INTEGER, fclass0 TEXT, code0 TEXT, name0 TEXT);
+
+CREATE TABLE location (timestamp DATETIME, date DATETIME, time text, userid INTEGER, suburb TEXT, 
+city TEXT, region TEXT, moving INTEGER, fclass0 TEXT, code0 TEXT, name0 TEXT);
 CREATE TABLE notification (timestamp DATETIME, date DATETIME, time TEXT, userid INTEGER, nontificationid INTEGER, source TEXT, isclearable INTEGER, isongoing INTEGER, status TEXT );
 CREATE TABLE IF NOT EXISTS "socio" (
 "userid" INTEGER,
@@ -88,6 +92,7 @@ CREATE TABLE IF NOT EXISTS "diary" (
   "time" TIME
 );
 
+```
 
 #  i can do some queries to check data integrity 
 
