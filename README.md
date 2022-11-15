@@ -14,7 +14,9 @@ CREATE TABLE touch (timestamp DATETIME, date DATETIME, time TEXT, userid INTEGER
 
 CREATE TABLE location (timestamp DATETIME, date DATETIME, time text, userid INTEGER, suburb TEXT, 
 city TEXT, region TEXT, moving INTEGER, fclass0 TEXT, code0 TEXT, name0 TEXT);
+
 CREATE TABLE notification (timestamp DATETIME, date DATETIME, time TEXT, userid INTEGER, nontificationid INTEGER, source TEXT, isclearable INTEGER, isongoing INTEGER, status TEXT );
+
 CREATE TABLE IF NOT EXISTS "socio" (
 "userid" INTEGER,
   "gender" TEXT,
@@ -99,7 +101,7 @@ CREATE TABLE IF NOT EXISTS "diary" (
 There are a total of 252 unique users 
 
 number of users for each dataset: 
-
+```
 questionnaries -> 249 users 
 time-diary     -> 241 
 application    -> 234 users 54 million rows
@@ -107,7 +109,7 @@ screen         -> 234 users 13 mln rows
 location       -> 221 users 1.9 mln rows
 touch          -> 201 users 130 mln rows 
 notification   -> 183 users 6.7 mln rows
-
+```
 
 
 There are 169 users that shared all the data 
@@ -119,8 +121,31 @@ After filtering these users
 
 There are 231 users with socio, td , application and screen 
 
-62 users miss data from at least one sensor
+62 users miss data from at least one sensor 
 13 miss location data 
 33 miss touch data 
 49 miss location data 
+
+
+## time diary 
+there are 1114 entries for each users in 29 days from 13-11-20 to 11-12-20 
+850 for the first 2 weeks
+264 from the second 2 weeks
+
+## touch
+
+## application 
+attention, there are 34 students that are in the dataset by actually there is no data about the application 
+
+the data is not consistent among the days, excluding the outliers, the numebr of users  is changing every day with a decresing trend
+
+13th of november there are 221 useful id
+11th of december there are 145 useful id 
+
+142 user have application data everyday 
+
+
+
+
+
 
