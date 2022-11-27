@@ -6,17 +6,19 @@ import time
 import pandas as pd
 
 
-location_file = '/Users/alessiogandelli/data_social_dynamics/locationeventpertime.csv'
-touch_file = '/Users/alessiogandelli/data_social_dynamics/touchevent.csv'
-notification_file = '/Users/alessiogandelli/data_social_dynamics/notificationevent.csv'
-application_file = '/Users/alessiogandelli/data_social_dynamics/applicationevent.csv'
-screen_file = '/Users/alessiogandelli/data_social_dynamics/PhoneEvents/screenevent.csv'
-
-db_file = '/Users/alessiogandelli/data_social_dynamics/social_dynamics.sqlite'
 
 
 
 
+data_dir = '/Volumes/boot420/Users/alessiogandelli/data_social_dynamics/'
+location_file =  data_dir + 'locationeventpertime.csv'
+touch_file = data_dir + 'touchevent.csv'
+notification_file = data_dir + 'notificationevent.csv'
+application_file =data_dir + 'applicationevent.csv'
+screen_file = data_dir + 'PhoneEvents/screenevent.csv'
+
+
+db_file = data_dir + 'sd.db'
 db = Database(db_file)
 
 
@@ -71,6 +73,7 @@ df_diary = df_td.filter(['id', 'date_not','first2w','week','what', 'travel_fromt
 df_diary.rename(columns={'id': 'userid','date_not': 'timestamp', 'travel_fromto': 'travel', 'where': 'where', 'withw': 'withwho'}, inplace=True)
 df_diary['date'] = df_diary['timestamp'].dt.date
 df_diary['time'] = df_diary['timestamp'].dt.time
+
 db.from_pandas(df_diary, 'diary')
 
 
@@ -147,3 +150,23 @@ csv_to_db_many(screen_file, 'screen', create_screen_table, clean_screen_row , in
 end = time.time()
 print((end - start)/60)
 # %%
+
+##### yardstick #####################################################
+df1 = pd.DataFrame()
+import datetime
+
+start = datetime.datetime(2020, 11, 13, 5)
+end = datetime.datetime(2020, 12, 12, 6)
+ids = pd.DataFrame(range(0,266))
+ids.columns = ['userid']
+
+df1['timestamp']= pd.date_range(start, end, freq='1min')
+df1['year'] = df1['timestamp'].dt.year
+df1['month'] = df1['timestamp'].dt.month
+df1['day'] = df1['timestamp'].dt.day
+df1['hour'] = df1['timestamp'].dt.hour
+df1['minute'] = df1['timestamp'].dt.minute
+df1.drop('timestamp', axis=1, inplace=True)
+
+df1.merge(ids, how='cross')
+
