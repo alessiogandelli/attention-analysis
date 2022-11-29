@@ -8,8 +8,6 @@ import pandas as pd
 
 
 
-
-
 data_dir = '/Volumes/boot420/Users/alessiogandelli/data_social_dynamics/'
 location_file =  data_dir + 'locationeventpertime.csv'
 touch_file = data_dir + 'touchevent.csv'
@@ -73,6 +71,8 @@ df_diary = df_td.filter(['id', 'date_not','first2w','week','what', 'travel_fromt
 df_diary.rename(columns={'id': 'userid','date_not': 'timestamp', 'travel_fromto': 'travel', 'where': 'where', 'withw': 'withwho'}, inplace=True)
 df_diary['date'] = df_diary['timestamp'].dt.date
 df_diary['time'] = df_diary['timestamp'].dt.time
+
+# manca tutta la parte di filtraggio dei 50 utenti con maggior numero di no information cheè stato erroneamente cancellato 
 
 db.from_pandas(df_diary, 'diary')
 

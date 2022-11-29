@@ -1,8 +1,5 @@
 #%%
-
 import sqlite3
-con = sqlite3.connect("/Users/alessiogandelli/data_social_dynamics/social_dynamics.db")
-# %%
 
 class Database:
     def __init__(self, name):
