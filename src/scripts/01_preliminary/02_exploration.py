@@ -118,7 +118,8 @@ venn({'all users': all_userid, 'complete data' : useful_all_sensors, 'discarded 
 
 ###### diary  ############################
 df = pd.read_sql_query("select * from diary", db.connection)
-df = df.loc[df['userid'].isin(useful_userid)]df = df.loc[df['userid'].isin(useful_userid)]
+df = df.loc[df['userid'].isin(useful_userid)]
+df = df.loc[df['userid'].isin(useful_userid)]
 
 df[df['first2w'] == 'First two weeks' ].groupby('userid').count().sort_values('userid')
 df[df['first2w'] != 'First two weeks' ].groupby('userid').count().sort_values('userid')
@@ -213,3 +214,6 @@ print(df[df['count(timestamp)'] < 10000].count()['userid'], 'users have less tha
 
 #  mean 
 print(round(df['count(timestamp)'].mean()), '-> mean number of entries per user')
+
+# max columns 
+pd.set_option('display.max_columns', 10)

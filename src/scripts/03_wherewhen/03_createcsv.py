@@ -116,6 +116,7 @@ df_app = df_app[df_app['apps'] != '']
 df_app = df_app[df_app['apps'] != 'com.miui.home' ]
 df_app = df_app[df_app['apps'] != 'it.unitn.disi.witmee.sensorlog' ]
 
+
 #replace app  names that cointsns call with call 
 # drop every column except timestamp userid and what 
 
@@ -127,18 +128,44 @@ df_socio = pd.read_sql(query, db.connection)
 df_socio = df_socio[['userid', 'age', 'gender', 'nationality', 'department', 'Extraversion', 'Agreeableness', 'Conscientiousness', 'Neuroticism', 'Openness', 'degree']]
 
 #%%
+''' notification '''
 
-# join tables yardstick app and time diary 
+query = '''select userid,
+                date(timestamp) as day,  
+                strftime('%H', timestamp) as hour, 
+                strftime('%M', timestamp) as min, 
+                source as notification 
+        from notification 
+        group by 
+                userid, 
+                date(timestamp), 
+                strftime('%H', timestamp), 
+                strftime('%M', timestamp)'''
+
+df_notif = pd.read_sql(query, db.connection)
+df_notif = df_notif.astype({'hour': 'int64', 'min': 'int64', 'day': 'datetime64[ns]'})
+
+
+df['day'] = df['day'].astype('datetime64[ns]')
+
+#%%
+
+
+
+''' join tables yardstick app and time diary '''
 
 
 
 df = df_yd.merge(df_diary, on = ['userid','day', 'hour', 'min'], how = 'left')
 df = df.merge(df_touch, on = ['userid','day', 'hour', 'min'], how = 'left')
 df = df.merge(df_app, on = ['userid','day', 'hour', 'min'], how = 'left')
-big_df =  df.merge(df_socio, on = ['userid'], how='left')
+df = df.merge(df_socio, on = ['userid'], how='left')
+df = df.merge(df_notif, on = ['userid','day', 'hour', 'min'], how = 'left')
 
+
+df.astype({'hour': 'int64', 'min': 'int64', 'day': 'datetime64[ns]', 'age': 'int64', 'apps': 'str', 'gender': 'str'})
+#%%
 # to csv 
-big_df.to_csv('merged_data.csv', index = False)
 # sort and reset index fixing the missing values 
 
 df = df.sort_values(['userid','day', 'hour', 'min'])
@@ -148,45 +175,54 @@ df['what'] = df['what'].fillna(method='ffill')
 df['touches'] = df['touches'].fillna(0).astype('int64')
 
 
+df['apps'] = df['apps'].str.replace('com\.', '')
+df['apps'] = df['apps'].str.replace('org\.', '')
+df['apps'] = df['apps'].str.replace('net\.', '')
+df['apps'] = df['apps'].str.replace('it\.', '')
+df['apps'] = df['apps'].str.replace('android', '')
+df['apps'] = df['apps'].str.replace('google', '')
+df['apps'] = df['apps'].str.replace('sec', '')
+df['apps'] = df['apps'].str.replace('samsung', '')
+df['apps'] = df['apps'].str.replace('\.app', '')
+df['apps'] = df['apps'].str.replace('\.\.', '.')
+df['apps'] = df['apps'].str.replace('^\.', '', regex=True)
+df['apps'] = df['apps'].str.replace('\.$', '', regex=True)
+
+df['notification'] = df['notification'].str.replace('com\.', '')
+df['notification'] = df['notification'].str.replace('org\.', '')
+df['notification'] = df['notification'].str.replace('net\.', '')
+df['notification'] = df['notification'].str.replace('it\.', '')
+df['notification'] = df['notification'].str.replace('android', '')
+df['notification'] = df['notification'].str.replace('google', '')
+df['notification'] = df['notification'].str.replace('sec', '')
+df['notification'] = df['notification'].str.replace('samsung', '')
+df['notification'] = df['notification'].str.replace('\.app', '')
+df['notification'] = df['notification'].str.replace('\.\.', '.')
+df['notification'] = df['notification'].str.replace('^\.', '', regex=True)
+df['notification'] = df['notification'].str.replace('\.$', '', regex=True)
+
+df['age'] = df['age'].astype('str')
+df['age'] = df['age'].replace('17-18', '18', regex=False)
+df['age'] = df['age'].replace('25-26', '25', regex=False)
+df['age'] = df['age'].replace('27-30', '29', regex=False)
+df['age'] = df['age'].replace('31+', '31', regex=False)
+df['age'] = df['age'].astype('int64')
 
 
 
 
-'''
-################################### DATA EXPLORATION ##############################################################
 
-'''
+
+
+
+
+
+
+df.to_csv('merged_data.csv', index = False)
+
+
+
 #%%
-
-'''a typical day'''
-
-df_area = df_diary[df_diary['day'] == '2020-11-20'].groupby(['hour','min', 'what']).size().unstack(fill_value = 0)
-
-df_area.plot(kind = 'area', stacked = True, figsize = (20, 10), title = 'Diary events per minute', colormap = 'tab20')
-plt.xticks(rotation = 90)
-# y axis  in percentage 
-import matplotlib.ticker as mtick
-plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(160))
-
-# cast tuple index to datatime
-
-
-#chenge tick frquency
-
-# %%
-''' most used apps '''
-
-
-top_apps  = df['apps'].value_counts()
-top_apps.head(10).plot(kind = 'bar', figsize = (20, 10), title = 'Most used apps', colormap = 'tab20')
-plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(sum(top_apps)))
-#put 10 y ticks 
-
-#%%
-app_names = top_apps.head(10).index.tolist()
-df_app = df[df['apps'].isin(app_names)]
-df_app.groupby('apps')['touches'].count().sort_values(ascending = False).plot(kind='bar',figsize = (20, 10), colormap = 'tab20')
-plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(sum(top_apps)))
 
 # p2 plots n the same figure 
 
@@ -201,25 +237,18 @@ plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(sum(top_apps)))
 
 
 
-gp = df.groupby(['what','apps'])['touches'].count()
-gp = gp.reset_index().sort_values(['what','touches'], ascending = False)
-
-# drop rows where app is launcher 
-
-
-# get top three for each what
-gp = gp.groupby('what').head(3)
-# %% most used apps by students 
-gp = df.groupby(['apps'])['touches'].count()
-
-
-
-# apps the user uses the most 
-df.groupby(['userid','apps']).count().sort_values(['userid','touches'], ascending=False).groupby('userid').head(3)
-
-# average minutes per day people use instagram 
-df[df['apps'] == 'com.instagram.android'].groupby(['userid','day']).count().groupby('userid').mean()
 # %%
-# daily average minutes per app
-df.groupby(['userid','apps','day']).count().groupby(['userid','apps']).mean().sort_values('touches', ascending=False).groupby('apps').head(3)
+#import csv filek 
+df = pd.read_csv('merged_data.csv')
 # %%
+
+
+'''a typical day'''
+
+df_area = df_diary[df_diary['day'] == '2020-11-20'].groupby(['hour','min', 'what']).size().unstack(fill_value = 0)
+
+df_area.plot(kind = 'area', stacked = True, figsize = (20, 10), title = 'Diary events per minute', colormap = 'tab20')
+plt.xticks(rotation = 90)
+# y axis  in percentage 
+import matplotlib.ticker as mtick
+plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(160))
