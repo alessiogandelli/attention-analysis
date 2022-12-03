@@ -16,6 +16,11 @@ df = df[['userid', 'day', 'hour', 'min', 'what', 'touches', 'apps', 'notificatio
        'gender', 'nationality', 'department', 'degree', 'Extraversion', 'Agreeableness',
        'Conscientiousness', 'Neuroticism', 'Openness']]
 
+# drop users with 0 notification 
+
+
+
+
 
 # %%
 ''' most used apps '''
@@ -25,15 +30,32 @@ df = df[['userid', 'day', 'hour', 'min', 'what', 'touches', 'apps', 'notificatio
 
 top_apps  = df['apps'].value_counts()
 top_apps.head(10).plot(kind = 'bar', figsize = (20, 10), title = 'Most used apps', colormap = 'tab20')
-#plt.xticks(rotation = 45)
-
-# remove com. from the label 
-
 plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(sum(top_apps)))
 # rotation of x axis labels
 
+
+'''NOTIFICATION'''
+#%% stacked area chart of a typical day with time on x axis 
+
+df_notif_user = df.groupby(['userid','day'])['notification'].count().groupby('userid').mean()#.plot(kind = 'bar', figsize = (20, 10), title = 'Average notifications per day', colormap = 'tab20')
+df_notif_user = df_notif_user[df_notif_user > 0]
+df_notif_user.describe()
+
+df.groupby(['hour', 'notification']).count()
+
+stavo facendo statistiche sulle varie notifiche, prosimo passoè vedere la distribusion di telegram instagram whatsapp 
+# 
+
+# create bins of 10 notifications per day
 #%%
-df.groupby(['hour', 'min', 'what']).count().plot(kind = 'area')
+#set max row pandas 
+pd.set_option('display.max_rows', 1000)
+
+#%%
+#plot with index as x axis and value as y axis
+vc.plot(kind = 'bar', x = 'index', y = 'notification', figsize = (20, 10), title = 'Average notifications per day', colormap = 'tab20')
+
+#df.groupby(['hour', 'min', 'what']).count().plot(kind = 'area')
 
 
 

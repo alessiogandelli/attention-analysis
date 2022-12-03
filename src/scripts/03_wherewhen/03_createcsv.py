@@ -134,7 +134,8 @@ query = '''select userid,
                 date(timestamp) as day,  
                 strftime('%H', timestamp) as hour, 
                 strftime('%M', timestamp) as min, 
-                source as notification 
+                source as notification ,
+                count(*) as not_count
         from notification 
         group by 
                 userid, 
@@ -146,7 +147,6 @@ df_notif = pd.read_sql(query, db.connection)
 df_notif = df_notif.astype({'hour': 'int64', 'min': 'int64', 'day': 'datetime64[ns]'})
 
 
-df['day'] = df['day'].astype('datetime64[ns]')
 
 #%%
 
