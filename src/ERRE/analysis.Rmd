@@ -1,0 +1,70 @@
+---
+title: "Untitled"
+output: html_document
+date: "2022-12-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd(dir = '/Users/alessiogandelli/dev/uni/attention-analysis/')
+```
+
+```{r}
+df <- read.csv('./../scripts/03_wherewhen/merged_data.csv')
+
+# what, apps, gender, deoartment, degree, notification as factor 
+df$what <- as.factor(df$what)
+df$apps <- as.factor(df$apps)
+df$gender <- as.factor(df$gender)
+df$department <- as.factor(df$department)
+df$degree <- as.factor(df$degree)
+
+# day as date
+df$day <- as.Date(df$day, format = "%Y-%m-%d")
+
+#perform latend profile analysis of df
+
+```
+
+```{r}
+library('pacman')
+p_load(ltm)
+p_load(psych)
+p_load(ggplot2)
+
+# create a data frame with the data
+data <- data.frame(df$what, df$apps, df$gender, df$department, df$degree, df$notification)
+
+# create a model with the data
+model <- ltm(data)
+
+# plot the model
+plot(model)
+
+# get the summary of the model
+summary(model)
+
+# get the factor scores
+scores <- factor.scores(model)
+
+# plot the factor scores
+plot(scores)
+
+# perform a principal component analysis
+pca <- psych::principal(df[, 2:7], nfactors = 2, rotate = "varimax")
+
+# plot the principal components
+plot(pca)
+
+# plot the factor scores
+plot(pca$loadings)
+
+# plot the factor scores
+ggplot(pca$loadings, aes(x = PC1, y = PC2, label = rownames(pca$loadings))) + 
+  geom_text()
+
+# plot the factor scores
+ggplot(pca$loadings, aes(x = PC1, y = PC2, label = rownames(pca$loadings))) +
+
+```
+

@@ -163,7 +163,6 @@ df = df.merge(df_socio, on = ['userid'], how='left')
 df = df.merge(df_notif, on = ['userid','day', 'hour', 'min'], how = 'left')
 
 
-df.astype({'hour': 'int64', 'min': 'int64', 'day': 'datetime64[ns]', 'age': 'int64', 'apps': 'str', 'gender': 'str'})
 #%%
 # to csv 
 # sort and reset index fixing the missing values 
@@ -174,7 +173,7 @@ df = df.set_index('id')
 df['what'] = df['what'].fillna(method='ffill')
 df['touches'] = df['touches'].fillna(0).astype('int64')
 
-
+#%%
 df['apps'] = df['apps'].str.replace('com\.', '')
 df['apps'] = df['apps'].str.replace('org\.', '')
 df['apps'] = df['apps'].str.replace('net\.', '')
@@ -187,6 +186,9 @@ df['apps'] = df['apps'].str.replace('\.app', '')
 df['apps'] = df['apps'].str.replace('\.\.', '.')
 df['apps'] = df['apps'].str.replace('^\.', '', regex=True)
 df['apps'] = df['apps'].str.replace('\.$', '', regex=True)
+df['apps'] = df['apps'].str.replace('gm', 'gmail', regex=False)
+df['apps'] = df['apps'].str.replace('gms', 'google_mobile_services')
+df['apps'] = df['apps'].str.replace('vending', 'play_store', regex=False)
 
 df['notification'] = df['notification'].str.replace('com\.', '')
 df['notification'] = df['notification'].str.replace('org\.', '')
@@ -200,6 +202,9 @@ df['notification'] = df['notification'].str.replace('\.app', '')
 df['notification'] = df['notification'].str.replace('\.\.', '.')
 df['notification'] = df['notification'].str.replace('^\.', '', regex=True)
 df['notification'] = df['notification'].str.replace('\.$', '', regex=True)
+df['notification'] = df['notification'].str.replace('gm', 'gmail', regex=False)
+df['notification'] = df['notification'].str.replace('gms', 'google_mobile_services', regex=False)
+df['notification'] = df['notification'].str.replace('vending', 'play_store', regex=False)
 
 df['age'] = df['age'].astype('str')
 df['age'] = df['age'].replace('17-18', '18', regex=False)
@@ -209,13 +214,40 @@ df['age'] = df['age'].replace('31+', '31', regex=False)
 df['age'] = df['age'].astype('int64')
 
 
+df['what'] = df['what'].replace('I will go to sleep', 'Sleeping')
+df['what'] = df['what'].replace('Rest/nap/anything', 'Sleeping')
+
+df['what'] = df['what'].replace('Eating', 'Food-related')
+df['what'] = df['what'].replace('Cooking', 'Food-related')
+
+df['what'] = df['what'].replace('Watching/TV/YouTube', 'Entertainment')
+df['what'] = df['what'].replace('FreeTime_culture', 'Entertainment')
+df['what'] = df['what'].replace('FreeTime_sports', 'Entertainment')
+df['what'] = df['what'].replace('I am at the cinema/theater/hospital/church', 'Entertainment')
+df['what'] = df['what'].replace('Listeningmusic/Reading', 'Entertainment')
+df['what'] = df['what'].replace('I will participate in sports activities', 'Entertainment')
+
+df['what'] = df['what'].replace('No information', 'Missing')
+df['what'] = df['what'].replace('Expired', 'Missing')
+
+df['what'] = df['what'].replace('Lecture', 'Work/Class')
+df['what'] = df['what'].replace('Work/Other', 'Work/Class')
+df['what'] = df['what'].replace('I am starting classes/lessons/lab', 'Work/Class')
+df['what'] = df['what'].replace('I have a work/study meeting', 'Work/Class')
+
+df['what'] = df['what'].replace('on foot', 'Moving')
+df['what'] = df['what'].replace('TravelPubTrans', 'Moving')
+df['what'] = df['what'].replace('Drive/bike/car', 'Moving')
 
 
 
 
 
+df.astype({'hour': 'int64', 'min': 'int64', 'day': 'datetime64[ns]', 'age': 'int64', 'apps': 'str', 'gender': 'str'})
 
 
+
+#%%
 
 
 df.to_csv('merged_data.csv', index = False)
