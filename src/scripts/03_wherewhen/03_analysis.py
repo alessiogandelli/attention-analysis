@@ -77,10 +77,30 @@ plt.gca().xaxis.set_major_formatter(mtick.PercentFormatter(sum(top_notif)))
 plt.xlabel('share of notification (%)')
 plt.ylabel('source')
 
+#%%
+#tree map with top_notif 
+import squarify
+
+# drop rows the one that contains the word system
+top_notif = top_notif[~top_notif.index.str.contains('system')]
+top_notif = top_notif[~top_notif.index.str.contains('vodafone')]
+top_notif = top_notif[~top_notif.index.str.contains('cc.pacer')]
+  
 
 
 
-plt.grid(True, alpha=0.3, linestyle="--") 
+plt.figure(figsize=(10, 10))
+squarify.plot(sizes=top_notif.head(10), label=top_notif.head(10).index, alpha=.7, color = sns.color_palette("tab20", 10), text_kwargs={'fontsize':14})
+plt.axis('off')
+plt.show()
+
+df= df[~df['notification'].str.contains('system')]
+
+# group by user and count application per day
+
+
+
+
 
 #%%
 
@@ -118,7 +138,7 @@ ax.set_title('What people do at different hours of the day')
 plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(sum(what_hour)/24))
 
 #x ticks frequency
-plt.xticks(np.arange(0, 24, 2))
+plt.xticks(np.arange(6, 24, 2))
 #%%
 # stacked area chart with seaborn 
 
@@ -146,6 +166,10 @@ ax = df_what.plot( kind='area', stacked=True, figsize=(20, 10), colormap = 'tab2
 
 plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(1))
 #x ticks frequency
+plt.xticks(np.arange(0, 24, 2))
+
+# put legend outside the plot wit a bigger size 
+plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., prop={'size': 15})
 
 
 plt.show()
@@ -153,8 +177,17 @@ plt.show()
 
 
 
+#%%
+df_study = df[df['what'] == 'Study/workgroup']
+#violin plot 
+ax = sns.violinplot(x="hour", y="department", data=df_study, palette="muted", inner = 'quartile', scale = 'width', cut = 0)
 
 
+
+
+
+
+#cluster users 
 
 
 
