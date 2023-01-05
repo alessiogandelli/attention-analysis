@@ -45,7 +45,6 @@ df = df[~df['userid'].isin(no_diary)]
 #%%
 
 
-
 #touches = 0 to nan 
 df['touches'] = df['touches'].replace(0, np.nan)
 
@@ -152,4 +151,10 @@ plt.xlabel('k')
 plt.ylabel('Sum_of_squared_distances')
 plt.title('Elbow Method For Optimal k')
 plt.show()
+# %%
+
+#correlogram  heatmap of different features red 
+corr = users_df.corr()
+sns.heatmap(corr)
+
 # %%
