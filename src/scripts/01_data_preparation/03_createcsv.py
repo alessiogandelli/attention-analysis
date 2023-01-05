@@ -39,6 +39,8 @@ df_diary['min'] = df_diary['timestamp'].dt.minute
 df_diary = df_diary.drop('timestamp', axis=1)
 df_diary = df_diary.astype({'hour': 'int64', 'min': 'int64', 'day': 'datetime64[ns]'})
 
+
+
 # merge sleeping and i will go to sleep 
 df_diary['what'] = df_diary['what'].replace('I will go to sleep', 'Sleeping')
 df_diary['what'] = df_diary['what'].replace('Rest/nap/anything', 'Sleeping')
@@ -255,8 +257,53 @@ df.to_csv('merged_data.csv', index = False)
 
 
 #%%
+''' adjust dataset'''
+data_folder = '/Users/alessiogandelli/dev/uni/attention-analysis/data/'
 
-# p2 plots n the same figure 
+with open(data_folder + 'userids.json') as f:
+        userids = json.load(f)
+
+userid_ww = set(userids['userid_ww'])
+userid_ext =  set(userids['userid_ext'])
+userid_app = set(userids['userid_app'])
+
+complete = userid_ww & userid_ext & userid_app
+
+
+
+types = {'what': 'category', 'apps': 'category', 'age' : 'int64', 'gender' : 'category', 'nationality' : 'category' , 
+        'department': 'category', 'degree' : 'category', 'notification': 'category', 'what' : 'category', 'apps' : 'category', }
+
+df = pd.read_csv(data_folder + 'merged_data.csv',  dtype= types, parse_dates=['day'])
+
+# reorder columns
+df = df[['userid', 'day', 'hour', 'min', 'what', 'touches', 'apps', 'notification', 'age',
+       'gender', 'department', 'degree', 'Extraversion', 'Agreeableness',
+       'Conscientiousness', 'Neuroticism', 'Openness']]
+
+
+''' at this point the dataset have 191 users'''
+
+# get only userid in complete 
+df = df[df['userid'].isin(complete)]
+
+''' at this point the dataset have 161 users'''
+
+# drop the first 20 userd with no diary , before this 23% of time diary is missing
+no_diary = df[df['what'] == 'Missing'].groupby('userid')['what'].count().sort_values(ascending=False).head(20).index.tolist()
+
+#drop no_diary users
+df = df[~df['userid'].isin(no_diary)]
+
+# after removing this 20 users this 14% of time diary is missing
+
+''' at this point the dataset have 141 users'''
+
+# save dataset
+df.to_csv(data_folder + 'merged_data.csv', index = False)
+
+
+
 
 
 

@@ -9,7 +9,7 @@ import json
 
 
 #%%
-# get data from db and cast to set 
+'''QUERY DB AND CREATE SETS OF USERID'''
 
 td_userid = db.query("select distinct userid from diary")
 socio_userid = db.query("select distinct userid from socio")
@@ -28,6 +28,9 @@ touch_userid = set([i[0] for i in touch_userid])
 screen_userid = set([i[0] for i in screen_userid])
 
 #%%
+'''SET OPERATIONS'''
+
+
 app_userid = app_userid - userid_noapp # computed later in the notebook
 # some set operations
 all_userid = td_userid | socio_userid | loc_userid | not_userid | app_userid | touch_userid | screen_userid
@@ -74,7 +77,8 @@ with open('/Users/alessiogandelli/Desktop/attention-analysis/data/userids.json',
 
 
 
-# print the results
+''' PRINT RESULTS'''
+
 print('\nthere are '+str(len(td_userid))+ ' users with diary data')
 print('there are '+str(len(socio_userid))+ ' users with socio data')
 print('there are '+str(len(loc_userid))+ ' users with location data')
@@ -106,30 +110,34 @@ print('For internal or external questions, we can use '+str(len(userid_ext))+' u
 print('For Application questions, we can use '+str(len(userid_app))+' users')
 
 #%%
-# visualize missing users 
+''' VENN DIAGRAMS'''
 
 venn({'missing location': useful_loc_missing, 'missig notification': useful_not_missing, 'missing app' : useful_app_missing})
 venn({'all users': all_userid, 'complete data' : useful_all_sensors, 'discarded users' : discarded_userid })
 
 
 #%%
-##  table by table exploration ############################
+'''########################### TABLES EXPLORATION ############################'''
 
 
-###### diary  ############################
+'''diary'''  #######################################################################################
+
+# query db 
 df = pd.read_sql_query("select * from diary", db.connection)
 df = df.loc[df['userid'].isin(useful_userid)]
-df = df.loc[df['userid'].isin(useful_userid)]
 
+# count how many entry per users devieded by week
 df[df['first2w'] == 'First two weeks' ].groupby('userid').count().sort_values('userid')
 df[df['first2w'] != 'First two weeks' ].groupby('userid').count().sort_values('userid')
 
 df.groupby('date').count().plot(type='bar', figsize=(20,10))
+df.groupby('date').nunique().plot(type='bar', figsize=(20,10))#count unique users by date
 
-#count unique users by date
-df.groupby('date').nunique().plot(type='bar', figsize=(20,10))
+#%%
 
-########################  touch  grouped by hour
+''' touch'''  ######################## ######################## ######################## ######################## 
+
+#query db
 df = pd.read_sql_query("select count(userid) from touch group by strftime( '%H', timestamp) " , db.connection)
 df.plot(kind='bar')
 
@@ -138,7 +146,7 @@ df = pd.read_sql_query("select  strftime( '%m', timestamp) ,strftime( '%d', time
 
 
 #%%
-#  notification  ############################
+'''notification'''  ######################  ##################### ############### ################# ####################################
 
 #  notification grouped by userid
 df = pd.read_sql_query("select  userid, count(nontificationid) from notification group  by userid  " , db.connection)
@@ -155,7 +163,7 @@ df.plot(kind='bar', figsize=(20,10))
 
 
 #%%
-#  application  ############################
+'''application'''  ####################################################################################
 
 #  application grouped by day
 query_app = "select date, count(distinct application) , count(distinct userid) from app where userid in"+ str(tuple(useful_userid))+"group by date " 
@@ -177,7 +185,7 @@ df.value_counts('application')
 
 
 #%%
-#  screen  ############################
+'''screen'''  ############################
 
 query_screen = "select  date, count(distinct userid) as n_user, status from screen group by date "
 df = pd.read_sql_query(query_screen , db.connection)
@@ -196,7 +204,7 @@ df
 
 
 #%%
-#  location  ############################
+'''location'''  ############################
 
 #  location grouped by day
 df = pd.read_sql_query("select strftime( '%m', timestamp), strftime( '%d', timestamp), count(distinct userid)from location  group by strftime( '%m', timestamp), strftime( '%d', timestamp)  " , db.connection)

@@ -7,38 +7,19 @@ import json
 import seaborn as sns
 from scipy import stats 
 # cast tuple index to datatime
+data_folder = '/Users/alessiogandelli/dev/uni/attention-analysis/data/'
 #%%
-with open('/Users/alessiogandelli/dev/uni/attention-analysis/data/userids.json') as f:
-        userids = json.load(f)
 
-userid_ww = set(userids['userid_ww'])
-userid_ext =  set(userids['userid_ext'])
-userid_app = set(userids['userid_app'])
+''' LOAD DATA '''
 
-complete = userid_ww & userid_ext & userid_app
-
-
-
-types = {'what': 'category', 'apps': 'category', 'age' : 'int64', 'gender' : 'category', 'nationality' : 'category' , 
-        'department': 'category', 'degree' : 'category', 'notification': 'category', 'what' : 'category', 'apps' : 'category', }
-
-df = pd.read_csv('/Users/alessiogandelli/dev/uni/attention-analysis/src/scripts/03_wherewhen/merged_data.csv', 
-                dtype= types, parse_dates=['day'])
+types = {'what': 'category', 'apps': 'category', 'age' : 'int64', 'gender' : 'category', 'nationality' : 'category' , 'department': 'category', 'degree' : 'category', 'notification': 'category', 'what' : 'category', 'apps' : 'category', }
+df = pd.read_csv(data_folder + 'merged_data.csv', dtype= types, parse_dates=['day'])
 
 # reorder columns
 df = df[['userid', 'day', 'hour', 'min', 'what', 'touches', 'apps', 'notification', 'age',
        'gender', 'department', 'degree', 'Extraversion', 'Agreeableness',
        'Conscientiousness', 'Neuroticism', 'Openness']]
 
-# get only userid in complete 
-df = df[df['userid'].isin(complete)]
-
-
-
-no_diary = df[df['what'] == 'Missing'].groupby('userid')['what'].count().sort_values(ascending=False).head(20).index.tolist()
-
-#drop no_diary users
-df = df[~df['userid'].isin(no_diary)]
 
 
 

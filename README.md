@@ -92,13 +92,16 @@ There were more than 30 possible values for the what field, i grouped them into 
 - entertainment
 - work/class 
 - other
+- missing
 
 ### users selection 
 
-there were 252 users in the dataset, but only 169 of them shared all the data, i decided to work only with these 169 users, to achieve this I used some set operation on the different users id for each
+there were 252 users in the dataset, but only 169 of them shared all the data, i decided to work only with these 161 users, to achieve this I used some set operation on the different users id for each
 
 this was not enough, in fact due to some problems there were users that showd no data for some sensor or just few, especially in the time diary there were a consistent group of people that answered just few times, i decided to discard these users, the final number of users is
+i dropped the first 20 users with no diary 
 
+141 users and 14% of missing time diary 
 
 ## yardstick 
 the next step was to aggregate the data in order to have a more compact representation of the data. in fact for some sensors we have many entries per second and this granurality was not needed. the new dataset have one entry per second per user, so i can have all the data in a 8 million lines csv file.
