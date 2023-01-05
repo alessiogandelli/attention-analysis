@@ -7,7 +7,7 @@ import pandas as pd
 
 
 
-
+# raw data location 
 data_dir = '/Volumes/boot420/Users/alessiogandelli/data_social_dynamics/'
 location_file =  data_dir + 'locationeventpertime.csv'
 touch_file = data_dir + 'touchevent.csv'
@@ -55,17 +55,21 @@ def csv_to_db_many(csv_file, table_name, create_query, clean_row, insert_query):
 
 
 
-#%%  socio e time diary 
+#%% 
+'''socio e time diary''' 
+
+# from stata file to dataframe
 df_td = pd.read_stata('/Users/alessiogandelli/Desktop/social dynamics lab/project/data/td_ita.dta')
 df_socio = pd.read_stata('/Users/alessiogandelli/Desktop/social dynamics lab/project/data/sociopsicodemo ITA.dta')
 
-df_socio['userid'] = df_socio['userid'].astype(int)
+df_socio['userid'] = df_socio['userid'].astype(int) # cast to int 
 
+# drop e rename colums di socio 
 df_socio = df_socio.drop(['token', 'w1_idpilot', 'pilot' ], axis=1)
 df_socio.rename(columns={'w1_A01': 'gender', 'cohort': 'age'}, inplace=True)
 db.from_pandas(df_socio, 'socio')
 
-
+# time diary cast id to int drop and rename columns, cast date and time to datetime
 df_td['id'] = df_td['id'].astype(int)
 df_diary = df_td.filter(['id', 'date_not','first2w','week','what', 'travel_fromto', 'travel_medium', 'sport', 'where', 'withw', 'mood'])
 df_diary.rename(columns={'id': 'userid','date_not': 'timestamp', 'travel_fromto': 'travel', 'where': 'where', 'withw': 'withwho'}, inplace=True)
@@ -74,11 +78,13 @@ df_diary['time'] = df_diary['timestamp'].dt.time
 
 # manca tutta la parte di filtraggio dei 50 utenti con maggior numero di no information cheè stato erroneamente cancellato 
 
+
+
 db.from_pandas(df_diary, 'diary')
 
 
 # %% 
-# ### LOCATION #####################################################
+'''#######################################   LOCATION    #####################################################'''
 start = time.time()
 
 create_location_table = "CREATE TABLE location (timestamp DATETIME, date DATETIME, time text, userid INTEGER, suburb TEXT, city TEXT, region TEXT, moving INTEGER, fclass0 TEXT, code0 TEXT, name0 TEXT)"
@@ -92,7 +98,7 @@ print((end - start)/60)
 
 
 # %%
-# ### TOUCH #####################################################
+'''#######################################   TOUCH    #####################################################'''
 
 start = time.time()
 
@@ -107,7 +113,7 @@ print((end - start)/60)
 
 
 # %% 
-##### APPLICATION #####################################################
+'''#######################################   APPLICATION    #####################################################'''
  
 start = time.time()
 
@@ -122,7 +128,7 @@ print((end - start)/60)
 
 
 # %% 
-# ### NOTIFICATION #####################################################
+'''#######################################   NOTIFICATION    #####################################################'''
 
 
 start = time.time()
@@ -137,7 +143,8 @@ csv_to_db_many(notification_file, 'notification', create_notification_table, cle
 end = time.time()
 print((end - start)/60)
 # %%
-###### SCREEN #####################################################
+'''#######################################   SCREEN    #####################################################'''
+
 start = time.time()
 
 
@@ -151,7 +158,7 @@ end = time.time()
 print((end - start)/60)
 # %%
 
-##### yardstick #####################################################
+'''#######################################   YARDSTICK    #####################################################'''
 df1 = pd.DataFrame()
 import datetime
 
