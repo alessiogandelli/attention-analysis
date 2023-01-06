@@ -54,7 +54,7 @@ df = df[df['what'] == 'Study/workgroup']
 
 # drop user 232
 # %%
-sig128 = df[df['userid'] == 128]
+sig128 = df[df['userid'] == 1]
 
 sig128_study = sig128[sig128['what'] == 'Study/workgroup']
 
@@ -62,14 +62,70 @@ sig128_study = sig128[sig128['what'] == 'Study/workgroup']
 sig128_study = sig128_study[sig128_study['day'] == '2020-11-30']
 
 nophone = []
+count = 0
+# filter on the column apps the value that are not a category 
+for touches in sig128_study['touches']:
+    if touches == 0:
+        count += 1
+    elif count > 0 :
+        nophone.append(count)
+        count = 0
 
-# if app is nan, then he is not using the phone count average lenght of the study session
+mean_nophone = np.mean(nophone)
+mean_nophone
+# this but for every user  
 
-# 
+#%%
+df_study = df[df['what'] == 'Study/workgroup'].head(10000)
+
+students = {}
+studentid = 0
+nophone = []
+count = 0
+
+for i, row in df_study.iterrows():
+
+    print(row['userid'], row['hour'], row['min'], count, touches)
+    # process student 
+    if row['userid'] != studentid:
+        print('processing student: ', studentid, row['hour'], row['min'])
+        students[studentid] = np.mean(nophone)
+        nophone = []
+        count = 0
+        studentid = row['userid']
 
 
+    if row['touches'] == 0:
+        count += 1
+    elif count > 0 :
+        nophone.append(count)
+        count = 0
+    
+# %%
+
+count = 0
+
+for i, row in df_study.iterrows():
 
 
+    if row['touches'] == 0:
+        count += 1
+    elif count > 0 :
+        nophone.append(count)
+        count = 0
+
+    df_study.loc[i, 'nophone'] = count
+
+
+df_study[df_study['userid'] == 1]['nophone'].mean()
+
+# from nophone column everytime there is 0 take the previous value and add to a list 
+# then take the mean of the list
+
+df_study
+
+
+#%%
 
 # most used apps while studying
 apps = sig128_study.groupby('apps')['userid'].count().sort_values(ascending=False)
@@ -80,4 +136,33 @@ apps = sig128_study.groupby('apps')['userid'].count().sort_values(ascending=Fals
 sig128_study.groupby('day')['what'].count().plot(kind='bar')
 # %%
 # stacked area chart of what he does during the day
+# %%
+# from df_study compute the average lenght of streak of 0 in the touches column for each user 
+df_grouped = df.groupby('userid')
+students = {}
+
+# iterate through each group
+for studentid, group in df_grouped:
+    # initialize the counter
+    print('computing student ',studentid)
+    count = 0
+    # initialize the list to store the counter values
+    nophone = []
+    # iterate through each row in the group
+    for i, row in group.iterrows():
+        # if touches is 0, increment the counter
+        if row['touches'] == 0:
+            count += 1
+        elif count > 0 :
+            nophone.append(count)
+            count = 0
+    # calculate the mean of the counter values
+    average = np.mean(nophone)
+    median = np.median(nophone)
+    std = np.std(nophone)
+    # store the result in the dictionary
+    students[studentid] = {'average': average, 'median': median, 'std': std}
+    print('mean: ', average, 'median: ', median, 'std: ', std)
+
+
 # %%
