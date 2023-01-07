@@ -133,7 +133,8 @@ we also have to take into account the period, in fact we are between november an
 
 said that now i want to study the use of the phone during the study time, i.e. what people do when they study, i.e. what apps they use, how many notifications they receive, how many touches they do, etc.
 
-the first metric i want to see is how frequently people touch their phone when they study 
+the first metric i want to see is how frequently people touch their phone when they study, it turns out that there are few people that can study without touching their phones but most of them can't stay without more than 20 minutes. 
+the mean is 25 min but the median is 5, this mean that probably sometimes they do no touch the phone for a long time and this increase the average 
 
 then it is interesting to see which application are they using , because some of them may are using the calculator but others whstapp, we'll also see if the touch of the phone is related to a notification 
 
