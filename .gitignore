@@ -131,3 +131,7 @@ dmypy.json
 *.db
 *.sqlite
 merged_data.csv
+
+*.pkl
+
+data

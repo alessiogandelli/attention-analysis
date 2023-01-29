@@ -11,10 +11,9 @@ data have been collected in november-december 2020
 In 2020 all the unitn students were asked to participate in this study. The sample is composed by unitn students, mainly italians, android users that accepted to participate in the study under a monetary compensation.
 
 
-
 more information about the data collection [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/08/2021-Datascientia-LivePeople-WeNet2020.pdf)
 
-the data have been collected mainly in 3 ways and a lot of data have been collected, i'll talk only about the data that i used in this project.
+the data have been collected mainly in 3 ways and for each students we have a lot of data, i'll talk only about the data that i used in this project.
 
 ## questionnaires 
 socio demographic data such as departement, age, sex  and psychological data: diffrent indicators but i only consider big 5 personality traits 
@@ -78,7 +77,7 @@ CREATE TABLE IF NOT EXISTS "diary" (
 
 
 # data preparation  
-Here i describe the processof data preparation, starting from the raw data, passinf to the cleaning and ending with the final dataset. The demographic and the time diary were already cleaned while the sesors data wer not so i had to do it by myself. 
+Here i describe the process of data preparation, starting from the raw data, passing to the cleaning and ending with the final dataset. The demographic and the time diary were already cleaned while the sesors data wer not so i had to do it by myself.
 
 
 ## data import to sqlite
@@ -121,7 +120,7 @@ the next step was to aggregate the data in order to have a more compact represen
 
 we start looking into general statistics on how students use their phones, the most used apps and the top installed and the top notification
 
-then i looked at an aggregated time diary to see what people do  during the day and turns out yhat they spend most of their time sleeping 20% and on average 11% studying 
+then i looked at an aggregated time diary to see what people do during the day and turns out that the  longest activity is sleeping 20% and on average 11% studying 
 
 now i want to focus on what people do when they study and see if i can group in different clusters and correlate with perdonality trait or demographics 
 
@@ -129,18 +128,39 @@ now i want to focus on what people do when they study and see if i can group in 
 
 the first thing was to look at the self reported time diary and to remove outliers, i.e. people that reported they studied 100% of the time (1 user) and 0% (4 users)
 
-we also have to take into account the period, in fact we are between november and december and how people study is not homegenous during the semester, i expect the ones with preappelli in december study more than the others that have exams in january and febraury, since we do not have this information we have to be careful in the interpretation of the results, in fact if someone attending a spefic course is studyng more than other we cannot say that that course is more difficult or require ore effort but maybe there are different deadlines, for such analysis we need morelongitudinal data
+we also have to take into account the period, in fact we are between november and december and how people study is not homegenous during the semester, I expect the ones with 'preappelli' in december study more than the others that have exams in january and febraury, since we do not have this information we have to be careful in the interpretation of the results, in fact if someone attending a spefic course is studyng more than other we cannot say that that course is more difficult or require ore effort but maybe there are different deadlines, for such analysis we need more longitudinal data
 
-said that now i want to study the use of the phone during the study time, i.e. what people do when they study, i.e. what apps they use, how many notifications they receive, how many touches they do, etc.
+said that now i want to study the use of the phone during the study time, i.e. what people do when they study: 
+-  what apps they use
+- how many notifications they receive
+- how many touches they do, etc.
 
-the first metric i want to see is how frequently people touch their phone when they study, it turns out that there are few people that can study without touching their phones but most of them can't stay without more than 20 minutes. 
+the first metric I explore is  how frequently people touch their phone when they study, it turns out that there are few people that can study without touching their phones but most of them can't stay without more than 20 minutes. 
 the mean is 25 min but the median is 5, this mean that probably sometimes they do no touch the phone for a long time and this increase the average 
 
-then it is interesting to see which application are they using , because some of them may are using the calculator but others whstapp, we'll also see if the touch of the phone is related to a notification 
+then it is interesting to see which application are they using, because some of them may are using the calculator but others whastapp, we'll also see if the touch of the phone is related to a notification.
 
 
+### applications 
+Looking at this image we can see how with the first 4 apps ( whatsapp, instagram, youtube, chrome) we cover 50% of the time, then we have a long tail of apps that are used less than 1% of the time, this is not surprising since we have 1000 apps installed and we use just a few of them. 
+
+![top apps](/plots/top_apps.png)
+
+Looking at the most installed apps we can see the presence of gmail, which is not a very used app but today checking mail is necessary, taking into account akso that the university mail is a google account.
+
+![top downloaded apps](/plots/top_installed_apps.png)
+
+### notifications
+Looking at notifications the presence of whatsapp is clear, but at the second place there is telegram which is not on the top download, but it is a very popular app, especially among students, where there are big groups and so receiveing many notification is normal. 
+
+![top notifications](/plots/top_notification_tree.png)
 
 
+### what 
+In this figure we can see for each hour what people do 
+
+
+![what](/plots/what.png)
 
 
 
