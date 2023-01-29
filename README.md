@@ -164,8 +164,12 @@ In this figure we can see for each hour what people do
 
 
 
+# results 
+## study 
 
+students reported that they study on average 3.9 hours a day eith a std of 1.6 
 
+now we look at how much on average passes between two notifications, there are 7 students out of 120 tha do not receive notification 
 
 
 

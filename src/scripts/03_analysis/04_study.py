@@ -182,3 +182,63 @@ plt.savefig(plot_folder + 'plots/no_touches_streak_log.png')
 # get all phone quantities
 
 
+
+
+
+'''RESULTS'''
+
+# general stats about stufyng 
+
+user_mean = df.groupby(['userid', 'day']).count().reset_index().groupby(['userid']).mean()
+
+(user_mean['hour']/60).describe()
+
+# histogram of study time
+plt.figure(figsize=(10, 5))
+plt.hist((user_mean['hour']/60), bins=10)
+plt.title('Distribution of the number of minutes spent studying')
+plt.xlabel('hours')
+plt.ylabel('frequency')
+plt.savefig(plot_folder + 'hist_study.png')
+
+# %%
+user_mean['min/not'] = user_mean['hour'] / user_mean['notification']
+# remove inf 
+user_mean = user_mean.replace([np.inf, -np.inf], np.nan)
+user_mean = user_mean.dropna()
+# histogram of time between notifications
+plt.figure(figsize=(10, 5))
+plt.hist(user_mean['min/not'], bins=100)
+plt.title('Distribution of the number of minutes between notifications')
+plt.xlabel('minutes')
+plt.ylabel('frequency')
+plt.savefig(plot_folder + 'hist_notific.png')
+
+
+user_mean['min/not'].describe()
+# mean 24 but  median is 6, this means that for half of the students 
+# the time between notifications is less than 6 minutes
+
+#get percentile of people that study more than 45 min 
+
+#%%
+# there is a big long tail so we have to focus onthe 90th percentile 
+threshold = user_mean['min/not'].quantile(0.9)
+# this value is 50 this means that 90% of the students receive at leat a noti
+# every 50 minutes
+# find all students withoin 90th percentile
+
+notification_90 = user_mean[user_mean['min/not'] < threshold]['min/not']
+
+# histogram of time between notifications
+plt.figure(figsize=(10, 5))
+plt.hist(notification_90, bins=50)
+plt.title('Distribution of the number of minutes between notifications')
+plt.xlabel('minutes')
+plt.ylabel('frequency')
+plt.savefig(plot_folder + 'hist_notific_90.png')
+
+
+
+
+# %%
