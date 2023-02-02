@@ -10,17 +10,15 @@ from scipy import stats
 data_folder = '/Users/alessiogandelli/dev/uni/attention-analysis/data/'
 plot_folder = '/Users/alessiogandelli/dev/uni/attention-analysis/plots/'
 #%%
+# cast tuple index to datatime
+data_folder = '/Users/alessiogandelli/dev/uni/attention-analysis/data/'
+plot_folder = '/Users/alessiogandelli/dev/uni/attention-analysis/plots/'
+#%%
 
 ''' LOAD DATA '''
+#df.to_pickle(data_folder + 'study_analysis.pkl')
 
-types = {'what': 'category', 'apps': 'category', 'age' : 'int64', 'gender' : 'category', 'nationality' : 'category' , 'department': 'category', 'degree' : 'category', 'notification': 'category', 'what' : 'category', 'apps' : 'category', }
-df = pd.read_csv(data_folder + 'merged_data.csv', dtype= types, parse_dates=['day'])
-
-# reorder columns
-df = df[['userid', 'day', 'hour', 'min', 'what', 'touches', 'apps', 'notification', 'age',
-       'gender', 'department', 'degree', 'Extraversion', 'Agreeableness',
-       'Conscientiousness', 'Neuroticism', 'Openness']]
-
+df = pd.read_pickle(data_folder + 'study_analysis.pkl')
 
 
 
@@ -30,7 +28,7 @@ df = df[['userid', 'day', 'hour', 'min', 'what', 'touches', 'apps', 'notificatio
 # most used apps 
 top_apps  = df['apps'].value_counts()
 
-top_apps.head(10).plot(kind = 'barh', figsize = (10, 5), title = 'Most used apps', colormap = 'tab20')
+top_apps.head(10).plot(kind = 'barh', figsize = (5, 3), title = 'Most used apps', colormap = 'tab20')
 plt.gca().xaxis.set_major_formatter(mtick.PercentFormatter(sum(top_apps)))
 plt.xlabel('share of usage (%)')
 
@@ -41,7 +39,7 @@ plt.savefig(plot_folder + 'top_apps.png', dpi=300, bbox_inches='tight')
 # how many users have installed each app
 n_users = df['userid'].nunique()
 user_installed_apps = df.groupby('apps')['userid'].nunique().sort_values(ascending=False).head(10)
-user_installed_apps.plot(kind = 'bar', figsize = (8, 5), title = 'Most installed apps', colormap = 'tab20')
+user_installed_apps.plot(kind = 'bar', figsize = (5, 5), title = 'Most installed apps', colormap = 'tab20')
 plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(n_users))
 # rotate x labels
 plt.xticks(rotation=30)
@@ -80,7 +78,7 @@ top_notif = top_notif[~top_notif.index.str.contains('cc.pacer')]
 
 
 
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(9, 9))
 squarify.plot(sizes=top_notif.head(10), label=top_notif.head(10).index, alpha=.7, color = sns.color_palette("tab20", 10), text_kwargs={'fontsize':14})
 plt.axis('off')
 
@@ -126,7 +124,7 @@ df_what = df_what[[ 'Missing', 'Sleeping','Entertainment', 'Work/Class',  'Study
 
 #using hours as x axis and all the activities as y axis
 
-ax = df_what.plot(kind='area', stacked=True, figsize=(15, 8), colormap = 'tab20', title = 'What people do at different hours of the day')
+ax = df_what.plot(kind='area', stacked=True, figsize=(10, 6), colormap = 'tab20', title = 'What people do at different hours of the day')
 
 plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(1))
 #x ticks frequency 5 to 24 and 24 to 4 

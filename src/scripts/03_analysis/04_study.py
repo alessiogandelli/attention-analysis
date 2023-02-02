@@ -6,6 +6,9 @@ import matplotlib.ticker as mtick
 import json
 import seaborn as sns
 from scipy import stats 
+from scipy.stats import pearsonr
+import numpy as np
+
 # cast tuple index to datatime
 data_folder = '/Users/alessiogandelli/dev/uni/attention-analysis/data/'
 plot_folder = '/Users/alessiogandelli/dev/uni/attention-analysis/plots/'
@@ -99,6 +102,8 @@ df_students = df.groupby(['userid', 'day']).apply(lambda x: pd.Series({'study_ti
 
 
 # from df_study compute the average lenght of streak of 0 in the touches column for each user 
+#nan to 0 in touches
+df['touches'] = df['touches'].replace(np.nan, 0)
 df_grouped = df.groupby('userid')
 students = {}
 
@@ -178,41 +183,75 @@ plt.xlabel('minutes')
 plt.ylabel('frequency')
 plt.savefig(plot_folder + 'plots/no_touches_streak_log.png')
 
+pd.Series(all_nophone).describe()
+
 # %%
-# get all phone quantities
-
-
-
-
 
 '''RESULTS'''
 
 # general stats about stufyng 
+df['touches'] = df['touches'].replace(0, np.nan)
 
 user_mean = df.groupby(['userid', 'day']).count().reset_index().groupby(['userid']).mean()
 
 (user_mean['hour']/60).describe()
 
-# histogram of study time
-plt.figure(figsize=(10, 5))
-plt.hist((user_mean['hour']/60), bins=10)
+# histogram of study time with seaborn
+import seaborn as sns
+sns.set(color_codes=True)
+sns.set(rc={'figure.figsize':(7,3)})
+sns.distplot((user_mean['hour']/60), bins=10)
 plt.title('Distribution of the number of minutes spent studying')
 plt.xlabel('hours')
 plt.ylabel('frequency')
 plt.savefig(plot_folder + 'hist_study.png')
 
-# %%
+
+
+# plt.figure(figsize=(10, 5))
+# plt.hist((user_mean['hour']/60), bins=10)
+# plt.title('Distribution of the number of minutes spent studying')
+# plt.xlabel('hours')
+# plt.ylabel('frequency')
+# plt.savefig(plot_folder + 'hist_study.png')
+
+# %% minutes between notificaitons
 user_mean['min/not'] = user_mean['hour'] / user_mean['notification']
 # remove inf 
 user_mean = user_mean.replace([np.inf, -np.inf], np.nan)
 user_mean = user_mean.dropna()
+
+'''notification'''
 # histogram of time between notifications
-plt.figure(figsize=(10, 5))
-plt.hist(user_mean['min/not'], bins=100)
+
+notification = user_mean['min/not']
+
+sns.set(color_codes=True)
+sns.set(rc={'figure.figsize':(7,3)})
+sns.distplot(notification, bins=100)
 plt.title('Distribution of the number of minutes between notifications')
 plt.xlabel('minutes')
 plt.ylabel('frequency')
+
+plt.xlim(0, 40)
+
+# add mean ad median 
+plt.axvline(notification.mean(), color='r', linestyle='dashed', linewidth=1)
+plt.axvline(notification.median(), color='r', linestyle='dashed', linewidth=1)
+# write mean and median
+plt.text(notification.mean() + 1, 0.08, 'Mean: {:.2f}'.format(notification.mean()))
+plt.text(notification.median() + 1, 0.08, 'Median: {:.2f}'.format(notification.median()))
+
 plt.savefig(plot_folder + 'hist_notific.png')
+
+
+
+# plt.figure(figsize=(10, 5))
+# plt.hist(user_mean['min/not'], bins=100)
+# plt.title('Distribution of the number of minutes between notifications')
+# plt.xlabel('minutes')
+# plt.ylabel('frequency')
+# plt.savefig(plot_folder + 'hist_notific.png')
 
 
 user_mean['min/not'].describe()
@@ -231,14 +270,66 @@ threshold = user_mean['min/not'].quantile(0.9)
 notification_90 = user_mean[user_mean['min/not'] < threshold]['min/not']
 
 # histogram of time between notifications
+
+sns.set(color_codes=True)
+sns.set(rc={'figure.figsize':(5,3)})
+sns.distplot(notification_90, bins=50)
+plt.title('number of minutes between notifications (90th perc)', fontsize=20)
+plt.xlabel('minutes')
+plt.ylabel('frequency')
+
+plt.xlim(0, 20)
+# font size 
+plt.rcParams.update({'font.size': 18})
+
+#increase title size
+
+
+# add mean ad median and mode
+plt.axvline(notification_90.mean(), color='r', linestyle='dashed', linewidth=1)
+plt.axvline(notification_90.median(), color='r', linestyle='dashed', linewidth=1)
+# write mean and median
+plt.text(notification_90.mean() + 1, 0.15, 'Mean: {:.2f}'.format(notification_90.mean()))
+plt.text(notification_90.median() + 1, 0.1, 'Median: {:.2f}'.format(notification_90.median()))
+
+# square behind 
+# plt.axvspan(0, notification_90.median(), alpha=0.2, color='red')
+# plt.axvspan(notification_90.median(), 50, alpha=0.2, color='green')
+
+#xtick 
+plt.xticks(np.arange(0, 40, 5.0))
+
+plt.savefig(plot_folder + 'hist_notific_90.png')
+
+# i want the last two plots in the same figure
+
+
+
+# correlation between touches and notification
+#%%
+rho = user_mean[['touches', 'notification']].corr()
+pval = user_mean[['touches', 'notification']].corr(method=lambda x, y: pearsonr(x, y)[1]) - np.eye(*rho.shape)
+p = pval.applymap(lambda x: ''.join(['*' for t in [.05, .01, .001] if x<=t]))
+rho.round(3).astype(str) + p
+
+# %%
+#minutes between touches 
+
+
+user_mean['min/touch'] = user_mean['hour'] / user_mean['touches']
+# remove inf 5 inf values
+user_mean_notna = user_mean.replace([np.inf, -np.inf], np.nan)
+user_mean_notna = user_mean_notna.dropna()
+# histogram of time between notifications
 plt.figure(figsize=(10, 5))
-plt.hist(notification_90, bins=50)
+plt.hist(user_mean_notna['min/touch'], bins=100)
 plt.title('Distribution of the number of minutes between notifications')
 plt.xlabel('minutes')
 plt.ylabel('frequency')
-plt.savefig(plot_folder + 'hist_notific_90.png')
+plt.savefig(plot_folder + 'hist_notific.png')
 
-
+# this plot but with seaborn distribution instead of hist
 
 
 # %%
+
